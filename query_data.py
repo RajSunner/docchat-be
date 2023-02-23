@@ -6,25 +6,24 @@ from dotenv.main import load_dotenv
 load_dotenv()
 
 _template = """Given the following conversation and a follow up question, rephrase the follow up question to be a standalone question.
-You can assume the question about the Ockenden Report.
+You can assume the question about the {doc_name}.
 
 Chat History:
 {chat_history}
 Follow Up Input: {question}
 Standalone question:"""
-CONDENSE_QUESTION_PROMPT = PromptTemplate.from_template(_template)
+CONDENSE_QUESTION_PROMPT = PromptTemplate(template=_template, input_variables=["question", "chat_history","doc_name"])
 
-template = """You are an AI assistant for answering questions about the Ockenden Report.
+template = """You are an AI assistant for answering questions about the {doc_name}.
 You are given the following extracted parts of a long document and a question. Provide a conversational answer.
 If you don't know the answer, just say "Hmm, I'm not sure." Don't try to make up an answer.
-If the question is not about the Ockenden Report, politely inform them that you are tuned to only answer questions about the Ockenden Report.
+If the question is not about the {doc_name}, politely inform them that you are tuned to only answer questions about the {doc_name}.
 Question: {question}
 =========
 {context}
 =========
 Answer in Markdown:"""
-QA_PROMPT = PromptTemplate(template=template, input_variables=["question", "context"])
-
+QA_PROMPT = PromptTemplate(template=template, input_variables=["question", "context","doc_name"])
 
 def get_chain(vectorstore):
     os.environ['OPENAI_API_KEY'] = os.environ['KEY'] 
