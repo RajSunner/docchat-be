@@ -8,7 +8,9 @@ from langchain.vectorstores.faiss import FAISS
 from langchain.embeddings import OpenAIEmbeddings
 import pickle
 from dotenv import load_dotenv
+
 load_dotenv()
+
 
 def create_vectors_from_url(url, name):
     req = urllib.request.Request(url)
@@ -16,19 +18,22 @@ def create_vectors_from_url(url, name):
     remote_file_bytes = io.BytesIO(remote_file)
     reader = PyPDF2.PdfReader(remote_file_bytes)
 
-    report_text = ''
+    report_text = ""
 
     for x in range(len(reader.pages)):
-      page = reader.pages[x]
-      report_text += page.extract_text()
+        page = reader.pages[x]
+        report_text += page.extract_text()
 
-    report_splitter = CharacterTextSplitter(separator=" ",chunk_size=1000, chunk_overlap=100)
+    report_splitter = CharacterTextSplitter(
+        separator=" ", chunk_size=1000, chunk_overlap=100
+    )
     texts = report_splitter.split_text(report_text)
 
-    os.environ['OPENAI_API_KEY'] = os.environ['KEY']
+    os.environ["OPENAI_API_KEY"] = os.environ["KEY"]
     # Load Data to vectorstore
     embeddings = OpenAIEmbeddings()
     vectorstore = FAISS.from_texts(texts, embeddings)
-    with open(name+".pkl", "wb") as f:
-       pickle.dump(vectorstore, f)
+    with open("vecstores/" + name + ".pkl", "wb") as f:
+        print("here in pickle creation")
+        pickle.dump(vectorstore, f)
     return vectorstore
