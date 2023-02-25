@@ -40,18 +40,20 @@ async def root():
 
 @app.post("/chat")
 async def query(query: Query, background_tasks: BackgroundTasks):
+    dname = query.dname.replace('"', "")
+    if dname.startswith(("The ", "the ")):
+        dname = dname[4:]
+
     file_name_ext = query.file_name + ".pkl"
     if file_name_ext in d:
         print("I ALREADY EXIST")
-        # look up the right vector store for str url.
+
         qa_chain = get_chain(d[file_name_ext])
-        # Need to modify prompt to take further params for the specific document being use
-        # currently hard coded for one report.
         result = qa_chain(
             {
                 "question": query.question,
                 "chat_history": query.history,
-                "doc_name": query.dname,
+                "doc_name": dname,
             }
         )
         results = {"answer": result["answer"]}
@@ -64,7 +66,7 @@ async def query(query: Query, background_tasks: BackgroundTasks):
             {
                 "question": query.question,
                 "chat_history": query.history,
-                "doc_name": query.dname,
+                "doc_name": dname,
             }
         )
         results = {"answer": result["answer"]}
